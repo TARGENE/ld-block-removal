@@ -5,5 +5,3 @@ channels:
   - defaults
 dependencies:
   - bgenix=1.1.7
-  - zlib=1.2
-
