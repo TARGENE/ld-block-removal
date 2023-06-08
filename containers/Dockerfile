@@ -5,10 +5,7 @@ FROM continuumio/miniconda3
 RUN apt-get update && apt-get install -y build-essential
 
 # Install GCC 9
-RUN apt-get install -y gcc-9
-
-# Install tar
-RUN apt-get install -y tar
+RUN apt-get install -y gcc-9 tar unzip liblapack3
 
 # Set environment variables for Anaconda
 ENV PATH="/opt/conda/bin:${PATH}"
