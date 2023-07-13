@@ -27,7 +27,7 @@ workflow import_snps {
         .fromPath(params.INPUT_SNPS, checkIfExists: true)
         .splitCsv(header:true)
         .map {
-            row -> tuple(row.CHR, row.POS, row.RSID)
+            row -> tuple(row.RSID, row.CHR, row.POS)
         }
         .set { snps }
 
@@ -36,18 +36,7 @@ workflow import_snps {
 }
 
 // Define processes
-process removePrefix {
-    input:
-    tuple val(prefix), path(files)
-    each common_prefix
-
-    output:
-    tuple val(stripped_prefix), path(files)
-
-    script:
-    stripped_prefix = prefix.replaceAll(common_prefix,'')
-    "echo Stripped prefix ${common_prefix} from filename"
-}
+include { pull_ld } from './modules/extract.nf'
 
 // Define workflow
 workflow {
@@ -58,11 +47,11 @@ workflow {
     // these files/keys have a matching prefix that is generally associated with the cohort name
     prefix = bgen_files.map({k, v -> k}).collect().map({v -> longest_common_prefix(v)})
 
-    bgen_files_ch = removePrefix(bgen_files, prefix)
-    snps_ch.join(bgen_files_ch)
-        .set{ input_ch }
-
-    input_ch.view()
+    bgen_files.map{ key, files -> files }
+        .collect()
+        .set {bgen_files_ch}
+    
+    pull_ld(snps_ch, bgen_files_ch, prefix)
 }
 
 
