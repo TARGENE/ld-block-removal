@@ -1,0 +1,16 @@
+name: bgen_python
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - pip=22.3.1
+  - python=3.11.0
+  - pip:
+    - dask==2023.7.0
+    - ipython==8.14.0
+    - matplotlib==3.7.2
+    - numpy==1.25.1
+    - pandas==2.0.3
+    - seaborn==0.12.2
+
