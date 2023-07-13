@@ -1,8 +1,0 @@
-name: ldblocks
-channels:
-  - conda-forge
-  - bioconda
-  - defaults
-dependencies:
-  - bgenix=1.1.7
-
