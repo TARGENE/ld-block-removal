@@ -38,3 +38,22 @@ process pull_ld {
     """
 
 }
+
+process compile_ld_information {
+    label 'python'
+    publishDir("$projectDir/output/", mode: "copy")
+
+    input:
+    path sqlite_files
+    path csv
+    path script
+
+    output:
+    path "*.csv"
+
+    script:
+    """
+    python ${script} --input ${csv}
+    """
+
+}
