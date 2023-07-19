@@ -36,7 +36,7 @@ workflow import_snps {
 }
 
 // Define processes
-include { pull_ld } from './modules/extract.nf'
+include { pull_ld; compile_ld_information } from './modules/extract.nf'
 
 // Define workflow
 workflow {
@@ -49,9 +49,18 @@ workflow {
 
     bgen_files.map{ key, files -> files }
         .collect()
-        .set {bgen_files_ch}
+        .set { bgen_files_ch }
     
-    pull_ld(snps_ch, bgen_files_ch, prefix)
+    ld_ch = pull_ld(snps_ch, bgen_files_ch, prefix)
+    // filter for just sqlite files and collect
+    ld_ch.map{ chr, pos, snp, sqlite_files -> sqlite_files }
+        .collect()
+        .set { sqlite_ch }
+
+    // compile LD_block information 
+    csv_ch = Channel.fromPath(params.INPUT_SNPS, checkIfExists: true)
+    script_ch = Channel.fromPath("$projectDir/py/convert_sqlite.py")
+    qtls_ch = compile_ld_information(sqlite_ch, csv_ch, script_ch)
 }
 
 
