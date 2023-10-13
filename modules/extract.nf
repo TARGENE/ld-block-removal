@@ -1,15 +1,20 @@
 process pull_ld {
     input:
-    tuple val(RSID), val(CHR), val(POS)
+    tuple val(RSID_LABEL), val(RSID), val(CHR), val(POS)
     path BGEN_FILES
     each PREFIX
 
     output:
-    tuple val(CHR), val(POS), val(RSID), path("${RSID}.sqlite")
+    tuple val(CHR), val(POS), val(RSID), val(RSID_LABEL), path("${RSID}.sqlite")
  
     script:
     """
-    CHR_FORMAT=\$(echo ${CHR} | xargs printf "%02d" )
+    if [[ "${params.COHORT}" == "UKBB" ]]; then 
+        CHR_FORMAT=\$(echo ${CHR} | xargs printf "%02d" )
+    elif [[ "${params.COHORT}" == "GENOMICC" ]]; then 
+        CHR_FORMAT=\$(echo chr${CHR} )
+    fi
+
     BGEN_FILE="${PREFIX}${CHR}.bgen"
     SAMPLE_FILE="${PREFIX}${CHR}.sample"
 
@@ -29,7 +34,7 @@ process pull_ld {
     fi
 
     # Use bgenix to create a new .bgen file with the info for just the SNP of interest + index file
-    bgenix -g \$BGEN_FILE -incl-rsids ${RSID} > "${RSID}.bgen"
+    bgenix -g \$BGEN_FILE -incl-rsids ${RSID_LABEL} > "${RSID}.bgen"
     bgenix -g "${RSID}.bgen" -index
 
     bgenix -g \$BGEN_FILE -incl-range "\$CHR_FORMAT:\$LOWER-\$UPPER" | qctool -g - -filetype bgen \
@@ -50,6 +55,7 @@ process compile_ld_information {
 
     output:
     path "*.csv"
+    path "LD_block_length_histogram.png"
 
     script:
     """
