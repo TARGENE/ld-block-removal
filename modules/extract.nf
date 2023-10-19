@@ -40,7 +40,7 @@ process pull_ld {
 }
 
 process compile_ld_information {
-    label 'python'
+    label 'bgen_env'
     publishDir("$projectDir/output/", mode: "copy")
 
     input:
