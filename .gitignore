@@ -1,0 +1,9 @@
+.nextflow*
+input/*
+work/*
+trace.txt*
+bgen_import.yaml
+output/*
+results/*
+py/*
+.vscode*

@@ -1,4 +1,6 @@
 process pull_ld {
+    container "roskamsh/qctools:0.1.1"
+
     input:
     tuple val(RSID_LABEL), val(RSID), val(CHR), val(POS)
     path BGEN_FILES
@@ -45,8 +47,8 @@ process pull_ld {
 }
 
 process compile_ld_information {
-    label 'python'
-    publishDir("$projectDir/output/", mode: "copy")
+    container "roskamsh/bgen_env:0.2.0"
+    publishDir("$params.OUTDIR/ld_blocks/", mode: "copy", pattern: "*LD_block*")
 
     input:
     path sqlite_files
@@ -54,7 +56,8 @@ process compile_ld_information {
     path script
 
     output:
-    path "*.csv"
+    path "LD_for_PCA.csv", emit: ld_pca
+    path "*_with_LD_blocks.csv"
     path "LD_block_length_histogram.png"
 
     script:
@@ -63,3 +66,4 @@ process compile_ld_information {
     """
 
 }
+
