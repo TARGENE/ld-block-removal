@@ -31,3 +31,34 @@ process AdaptFlashPCA {
         JULIA_DEPOT_PATH=\$TEMPD:/opt julia --project=/TargeneCore.jl --startup-file=no /TargeneCore.jl/bin/prepare_confounders.jl --input $flashpca_out --output pcs.csv adapt
         """
 }
+
+process ScreePlot {
+    container "roskamsh/bgen_env:0.2.0"
+    publishDir "$params.OUTDIR/pca/", mode: 'symlink'
+
+    input:
+        path pve
+
+    output:
+        path "ScreePlot.pdf"
+
+    script:
+        """
+        #!/usr/bin/env Rscript
+        library(ggplot2)
+
+        pve <- read.table("$pve")
+        pve[['PC']] <- 1:nrow(pve)
+        colnames(pve)[1] <- "pve"
+
+        pdf("ScreePlot.pdf")
+        ggplot(data = pve, mapping = aes(x = PC, y = pve)) +
+          geom_point() +
+          geom_line() +
+          ylab("Proportion of Variance Explained") +
+          theme_bw()
+        dev.off()
+        """
+
+}
+
