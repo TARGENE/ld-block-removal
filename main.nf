@@ -31,7 +31,7 @@ def longest_common_prefix(List<String> strs) {
 // Import processes
 include { pull_ld; compile_ld_information } from './modules/extract.nf'
 include { IIDGenotypes } from './modules/genotypes.nf'
-include { FlashPCA; AdaptFlashPCA } from './modules/confounders.nf'
+include { FlashPCA; AdaptFlashPCA; ScreePlot } from './modules/confounders.nf'
 
 workflow importSNPs {
     main:
@@ -125,10 +125,7 @@ workflow geneticConfounders {
     main:
         FlashPCA(iid_genotypes)
         AdaptFlashPCA(FlashPCA.out.pcs)
-
-    emit:
-        AdaptFlashPCA.out
-
+        ScreePlot(FlashPCA.out.pve)
 }
 
 // Define workflow
