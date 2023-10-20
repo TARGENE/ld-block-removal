@@ -46,7 +46,7 @@ process pull_ld {
 
 process compile_ld_information {
     label 'bgen_env'
-    publishDir("$projectDir/output/", mode: "copy")
+    publishDir("$projectDir/output/", mode: "copy", pattern: "*LD_block*")
 
     input:
     path sqlite_files
@@ -54,7 +54,8 @@ process compile_ld_information {
     path script
 
     output:
-    path "*.csv"
+    path "LD_for_PCA.csv", emit: ld_pca
+    path "*_with_LD_blocks.csv"
     path "LD_block_length_histogram.png"
 
     script:
@@ -63,3 +64,4 @@ process compile_ld_information {
     """
 
 }
+
