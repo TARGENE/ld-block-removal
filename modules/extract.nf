@@ -2,9 +2,7 @@ process pull_ld {
     container "roskamsh/qctools:0.1.1"
 
     input:
-    tuple val(RSID_LABEL), val(RSID), val(CHR), val(POS)
-    path BGEN_FILES
-    each PREFIX
+    tuple val(RSID_LABEL), val(RSID), val(CHR), val(POS), val(PREFIX), path(BGEN_FILES)
 
     output:
     tuple val(CHR), val(POS), val(RSID), val(RSID_LABEL), path("${RSID}.sqlite")
