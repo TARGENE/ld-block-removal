@@ -34,6 +34,9 @@ include { IIDGenotypes } from './modules/genotypes.nf'
 include { FlashPCA; AdaptFlashPCA; ScreePlot } from './modules/confounders.nf'
 
 workflow importSNPs {
+    take:
+        bgen_files
+        bgen_prefix
     main:
         Channel
             .fromPath(params.INPUT_SNPS, checkIfExists: true)
@@ -43,33 +46,37 @@ workflow importSNPs {
             }
             .set { snps_ch }
 
-    emit:
         snps_ch
+            .combine(bgen_prefix)
+            .combine(bgen_files)
+            .set { snps_bgen_ch }
+
+    emit:
+        snps_bgen_ch
 }
 
 workflow configureBGEN {
     main:
-        bgen_files = Channel.fromFilePairs("$params.BGEN_FILES", size: 3, checkIfExists: true)
-        // these files/keys have a matching prefix that is generally associated with the cohort name
-        bgen_prefix = bgen_files.map({k, v -> k}).collect().map({v -> longest_common_prefix(v)})
+        bgen_files = Channel.fromFilePairs("$params.BGEN_FILES", size: -1, checkIfExists: true)
 
-        bgen_files.map{ key, files -> files }
-            .collect()
-            .set { bgen_files_ch }
+        bgen_files
+            .multiMap{ 
+                prefix, files -> 
+                files: [files]
+                prefix: prefix }
+            .set { bgen_ch }
 
     emit:
-        files = bgen_files_ch
-        prefix = bgen_prefix
+        files = bgen_ch.files
+        prefix = bgen_ch.prefix
 }
 
 workflow computeLD {
     take:
-        snps
-        bgen_files
-        bgen_prefix
+        snps_bgen
 
     main:
-        ld_ch = pull_ld(snps, bgen_files, bgen_prefix)
+        ld_ch = pull_ld(snps_bgen)
         // filter for just sqlite files and collect
         ld_ch.map{ chr, pos, snp, snp_label, sqlite_files -> sqlite_files }
             .collect()
@@ -84,22 +91,27 @@ workflow computeLD {
 }
 
 workflow extractTraits {
-    traits_config = Channel.value(file("$params.TRAITS_CONFIG"))
-    withdrawal_list = Channel.value(file("$params.WITHDRAWAL_LIST"))
-    if (params.DECRYPTED_DATASET == "NO_FILE") {
-        encrypted_dataset = Channel.value(file("$params.ENCRYPTED_DATASET"))
-        encoding_file = Channel.value(file("$params.ENCODING_FILE"))
-        UKBFieldsList(traits_config)
-        decrypted_dataset = UKBConv(UKBFieldsList.out, encrypted_dataset, encoding_file)
-    }
+    if (params.COHORT == "UKBB") {
+        traits_config = Channel.value(file("$params.TRAITS_CONFIG"))
+        withdrawal_list = Channel.value(file("$params.WITHDRAWAL_LIST"))
+        if (params.DECRYPTED_DATASET == "NO_FILE") {
+            encrypted_dataset = Channel.value(file("$params.ENCRYPTED_DATASET"))
+            encoding_file = Channel.value(file("$params.ENCODING_FILE"))
+            UKBFieldsList(traits_config)
+            decrypted_dataset = UKBConv(UKBFieldsList.out, encrypted_dataset, encoding_file)
+        }
+        else {
+            decrypted_dataset = Channel.value(file("$params.DECRYPTED_DATASET"))
+        }
+
+        phenoInput = TraitsFromUKB(decrypted_dataset, traits_config, withdrawal_list)
+    } 
     else {
-        decrypted_dataset = Channel.value(file("$params.DECRYPTED_DATASET"))
+        phenoInput = Channel.fromPath("$params.DECRYPTED_DATASET", checkIfExists: true) 
     }
-
-    TraitsFromUKB(decrypted_dataset, traits_config, withdrawal_list)
-
+    
     emit:
-        TraitsFromUKB.out
+        phenoInput
 }
 
 workflow generateIIDGenotypes {
@@ -130,26 +142,18 @@ workflow geneticConfounders {
 
 // Define workflow
 workflow {
-    // compute regions of LD around each VOI
-    snps_ch = importSNPs()
+    configureBGEN()
 
-    bgen_ch = configureBGEN()
-   
-    ld_ch = computeLD(snps_ch, bgen_ch.files, bgen_ch.prefix)
+    importSNPs(configureBGEN.out.files, configureBGEN.out.prefix)
 
-    // run PCA on entire cohort, excluding regions of LD
-    if (params.COHORT == "UKBB") {
-        extractTraits()
-        phenoInput = extractTraits.out
-    } else {
-        phenoInput = Channel.fromPath("$params.DECRYPTED_DATASET", checkIfExists: true)
-    }
+    computeLD(importSNPs.out)
 
-    // Generate IID Genotypes
-    generateIIDGenotypes(phenoInput, ld_ch.ld_blocks)
+    extractTraits()
 
-    // Genetic confounders up to NB_PCS
+    generateIIDGenotypes(extractTraits.out, computeLD.out.ld_blocks)
+
     geneticConfounders(generateIIDGenotypes.out)
+    
 }
 
 
