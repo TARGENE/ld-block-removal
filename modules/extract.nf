@@ -56,7 +56,8 @@ process compile_ld_information {
     path script
 
     output:
-    path "*_with_LD_blocks.csv", emit: ld_pca
+    path "LD_for_PCA.csv", emit: ld_pca
+    path "*_with_LD_blocks.csv"
     path "LD_block_length_histogram.png"
 
     script:
