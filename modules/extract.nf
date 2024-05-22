@@ -2,10 +2,10 @@ process pull_ld {
     container "roskamsh/qctools:0.1.1"
 
     input:
-    tuple val(RSID_LABEL), val(RSID), val(CHR), val(POS), val(PREFIX), path(BGEN_FILES)
+    tuple val(RSID), val(CHR), val(POS), val(PREFIX), path(BGEN_FILES)
 
     output:
-    tuple val(CHR), val(POS), val(RSID), val(RSID_LABEL), path("${RSID}.sqlite")
+    tuple val(RSID), val(CHR), val(POS), path("*.sqlite")
  
     script:
     """
@@ -33,12 +33,14 @@ process pull_ld {
       UPPER="0"
     fi
 
+    OUTNAME=\$( echo ${RSID} | sed 's/:/_/g' )
+
     # Use bgenix to create a new .bgen file with the info for just the SNP of interest + index file
-    bgenix -g \$BGEN_FILE -incl-rsids ${RSID_LABEL} > "${RSID}.bgen"
-    bgenix -g "${RSID}.bgen" -index
+    bgenix -g \$BGEN_FILE -incl-rsids ${RSID} > "\$OUTNAME.bgen"
+    bgenix -g "\$OUTNAME.bgen" -index
 
     bgenix -g \$BGEN_FILE -incl-range "\$CHR_FORMAT:\$LOWER-\$UPPER" | qctool -g - -filetype bgen \
-           -s \$SAMPLE_FILE -compute-ld-with "${RSID}.bgen" \$SAMPLE_FILE -old "sqlite://${RSID}.sqlite:LD"  \
+           -s \$SAMPLE_FILE -compute-ld-with "\$OUTNAME.bgen" \$SAMPLE_FILE -old "sqlite://\$OUTNAME.sqlite:LD"  \
            -min-r2 0.05
     """
 
@@ -54,8 +56,7 @@ process compile_ld_information {
     path script
 
     output:
-    path "LD_for_PCA.csv", emit: ld_pca
-    path "*_with_LD_blocks.csv"
+    path "*_with_LD_blocks.csv", emit: ld_pca
     path "LD_block_length_histogram.png"
 
     script:
