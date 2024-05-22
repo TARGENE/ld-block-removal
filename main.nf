@@ -42,7 +42,7 @@ workflow importSNPs {
             .fromPath(params.INPUT_SNPS, checkIfExists: true)
             .splitCsv(header:true)
             .map {
-                row -> tuple(row.RSID_LABEL, row.RSID, row.CHR, row.POS)
+                row -> tuple(row.RSID, row.CHR, row.POS)
             }
             .set { snps_ch }
 
@@ -78,7 +78,7 @@ workflow computeLD {
     main:
         ld_ch = pull_ld(snps_bgen)
         // filter for just sqlite files and collect
-        ld_ch.map{ chr, pos, snp, snp_label, sqlite_files -> sqlite_files }
+        ld_ch.map{ snp, chr, pos, sqlite_files -> sqlite_files }
             .collect()
             .set { sqlite_ch }
 
