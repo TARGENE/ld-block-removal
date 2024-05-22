@@ -4,10 +4,7 @@ process filterBED{
     publishDir "$params.OUTDIR/qc_filtered_chromosomes", mode: 'symlink'
 
     input:
-        tuple val(chr_id), file(bedfiles)
-        path qcfile
-        path ld_blocks
-        path traits
+        tuple val(chr_id), file(bedfiles), path(qcfile), path(ld_blocks), path(traits)
 
     output:
         path "filtered.*", emit: filtered_bedfiles
@@ -90,7 +87,11 @@ workflow IIDGenotypes{
         sample_ids
 
     main:
-        filtered_bedfiles = filterBED(bed_files, qc_file, ld_blocks, sample_ids)
+        combined_ch = bed_files
+            .combine(qc_file)
+            .combine(ld_blocks)
+            .combine(sample_ids)
+        filtered_bedfiles = filterBED(combined_ch)
         ld_pruned = thinByLD(flashpca_excl_reg, filtered_bedfiles)
         mergeBEDS(ld_pruned.collect())
         SampleQCFilter(mergeBEDS.out.collect())
