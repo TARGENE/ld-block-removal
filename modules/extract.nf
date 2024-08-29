@@ -1,5 +1,5 @@
 process pull_ld {
-    container "roskamsh/qctools:0.1.1"
+    label 'qctool_image'
 
     input:
     tuple val(RSID), val(CHR), val(POS), val(PREFIX), path(BGEN_FILES)
@@ -47,7 +47,7 @@ process pull_ld {
 }
 
 process compile_ld_information {
-    container "roskamsh/bgen_env:0.2.0"
+    label 'bgen_python_image'
     publishDir("$params.OUTDIR/ld_blocks/", mode: "copy", pattern: "*LD_block*")
 
     input:

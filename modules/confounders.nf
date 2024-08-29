@@ -1,6 +1,6 @@
 process FlashPCA {
     label "multithreaded"
-    container "ktetleycampbell/flashpca:1.0"
+    label 'flashpca_image'
 
     input:
         path bedfiles
@@ -15,7 +15,7 @@ process FlashPCA {
 }
 
 process AdaptFlashPCA {
-    container "olivierlabayle/tl-core:0.9.0"
+    label 'tl_core_image'
     publishDir "$params.OUTDIR/covariates/", mode: 'symlink'
     label 'bigmem'
     
@@ -33,7 +33,7 @@ process AdaptFlashPCA {
 }
 
 process ScreePlot {
-    container "roskamsh/bgen_env:0.2.0"
+    label 'bgen_python_image'
     publishDir "$params.OUTDIR/pca/", mode: 'symlink'
 
     input:

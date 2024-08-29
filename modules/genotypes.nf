@@ -1,6 +1,6 @@
 process filterBED{
     label 'bigmem'
-    container "olivierlabayle/tl-core:0.9.0"
+    label 'tl_core_image'
     publishDir "$params.OUTDIR/qc_filtered_chromosomes", mode: 'symlink'
 
     input:
@@ -24,7 +24,7 @@ process filterBED{
 
 process thinByLD{
     label 'bigmem'
-    container "olivierlabayle/plink2:0.1.0"
+    label 'plink2_image'
     publishDir "$params.OUTDIR/ld_pruned_chromosomes", mode: 'symlink'
 
     input:
@@ -45,7 +45,7 @@ process thinByLD{
 
 process mergeBEDS{
     label 'bigmem'
-    container "olivierlabayle/tl-core:0.9.0"
+    label 'tl_core_image'
     publishDir "$params.OUTDIR/merged_genotypes", mode: 'symlink'
     
     input:
@@ -64,7 +64,7 @@ process mergeBEDS{
 
 process SampleQCFilter {
     label 'bigmem'
-    container "olivierlabayle/plink2:0.1.0"
+    label 'plink2_image'
     publishDir "$params.OUTDIR/iid_genotypes", mode: 'symlink'
 
     input:
