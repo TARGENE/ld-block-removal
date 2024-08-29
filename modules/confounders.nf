@@ -15,7 +15,7 @@ process FlashPCA {
 }
 
 process AdaptFlashPCA {
-    container "olivierlabayle/tl-core:brh_data_source"
+    container "olivierlabayle/tl-core:0.9.0"
     publishDir "$params.OUTDIR/covariates/", mode: 'symlink'
     label 'bigmem'
     
