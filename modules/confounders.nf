@@ -16,8 +16,9 @@ process FlashPCA {
 
 process AdaptFlashPCA {
     label 'tl_core_image'
-    publishDir "$params.OUTDIR/covariates/", mode: 'symlink'
     label 'bigmem'
+    publishDir "$params.OUTDIR/covariates/", mode: 'symlink'
+    
     
     input:
         path flashpca_out
