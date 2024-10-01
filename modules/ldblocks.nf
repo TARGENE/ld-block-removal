@@ -12,7 +12,7 @@ process pull_ld {
     script:
     PREFIX = longest_prefix(BGEN_FILES)
     """
-    if [[ "${params.COHORT}" == "UKBB" ]]; then 
+    if [[ "${params.COHORT}" == "UKB" ]]; then 
         CHR_FORMAT=\$(echo ${CHR} | xargs printf "%02d" )
     elif [[ "${params.COHORT}" == "GENOMICC" ]]; then 
         CHR_FORMAT=\$(echo chr${CHR} )
