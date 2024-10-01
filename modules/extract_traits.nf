@@ -8,7 +8,7 @@ process UKBFieldsList {
         path "fields_list.txt"
 
     script:
-        ukb_config = ukb_config.getName() != 'NO_UKB_TRAIT_CONFIG' ? "--conf $ukb_config" : ''
+        ukb_config = ukb_config.getName() != 'NO_UKB_CONFIG' ? "--conf $ukb_config" : ''
         """
         TEMPD=\$(mktemp -d)
         JULIA_DEPOT_PATH=\$TEMPD:/opt julia --project=/UKBMain.jl --startup-file=no /UKBMain.jl/scripts/build_fields_list.jl $ukb_config
@@ -45,7 +45,7 @@ process TraitsFromUKB {
         path 'traits.csv'
 
     script:
-        ukbconfig = ukbconfig.getName() != 'NO_UKB_TRAIT_CONFIG' ? "--conf $ukbconfig" : ''
+        ukbconfig = ukbconfig.getName() != 'NO_UKB_CONFIG' ? "--conf $ukbconfig" : ''
         withdrawal_list = withdrawal_list.getName() != 'NO_WITHDRAWAL_LIST' ? "--withdrawal-list $withdrawal_list" : ''
         """
         TEMPD=\$(mktemp -d)
