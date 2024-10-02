@@ -13,15 +13,15 @@ process filterBED {
 
     script:
         input_prefix = bedfiles[0].toString().minus('.bed')
-        qc_file = qcfile.getName() != 'NO_QC_FILE' ? "--qc-file ${qcfile}" : '' 
-        ld_blocks = ld_blocks.getName() != 'NO_LD_BLOCKS' ? "--ld-blocks-file ${ld_blocks}" : ''
+        qc_file_flag = qcfile.getName() != 'NO_QC_FILE' ? "--qc-file ${qcfile}" : '' 
+        ld_blocks_flag = ld_blocks.getName() != 'NO_LD_BLOCKS' ? "--ld-blocks-file ${ld_blocks}" : ''
         """
         TEMPD=\$(mktemp -d)
         JULIA_DEPOT_PATH=\$TEMPD:/opt julia --project=/TargeneCore.jl --startup-file=no /TargeneCore.jl/targenecore.jl \
             filter-chromosome ${input_prefix} filtered.${input_prefix} ${traits} \
-            ${qc_file} \
+            ${qc_file_flag} \
             --maf-threshold=${params.MAF_THRESHOLD} \
-            ${ld_blocks}
+            ${ld_blocks_flag}
         """
 }
 
@@ -116,7 +116,7 @@ process ScreePlot {
         #!/usr/bin/env Rscript
         library(ggplot2)
 
-        pve <- read.table("$pve")
+        pve <- read.table("${pve}")
         pve[['PC']] <- 1:nrow(pve)
         colnames(pve)[1] <- "pve"
 
