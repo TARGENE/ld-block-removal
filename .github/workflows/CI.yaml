@@ -29,4 +29,4 @@ jobs:
       - name: Set up nextflow
         uses: nf-core/setup-nextflow@v1.2.0
       - name: Run tests
-        run: python test/${{ matrix.testrun }} 
+        run: pytest test/${{ matrix.testrun }} 
