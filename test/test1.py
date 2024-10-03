@@ -1,17 +1,25 @@
 import subprocess
 import pandas as pd
-import numpy as np
+import pytest
+import os
 
 # Define the command to run as a list
 command = ["nextflow","run","main.nf","-c","test/test.config","-profile","ci"]
 
-# Run the command and capture the output
-result = subprocess.run(command, capture_output=True, text=True)
+# Run command to generate results first
+@pytest.fixture(scope="module", autouse=True)
+def generate_results(command):
+    result = subprocess.run(command, capture_output=True, text=True)
+    return result
 
 # Check if the command was successful
-if result.returncode == 0:
-    # Print the standard output from the command
-    print("Command output:\n", result.stdout)
-else:
-    # Print the error if the command failed
-    print("Command failed with error:\n", result.stderr)
+def test_run_completed(generate_results):
+    assert generate_results.returncode == 0
+
+def test_ld_block_output(generate_results):
+    ld_blocks = pd.read_csv("results/ld_blocks/snps_with_LD_blocks.csv")
+    assert len(ld_blocks.RSID)==3, "Expected 3 SNPs in output LD blocks file."
+    assert ld_blocks.columns == ['RSID','CHR','POS','LDblock_lower','LDblock_upper','LDblock_length','lower_bound','upper_bound'], "Column names do not match expected names in LD blocks file."
+
+def test_screeplot_exists(generate_results):
+    assert os.path.exists("results/pca/ScreePlot.pdf"), "Expected output ScreePlot from pipeline run."
