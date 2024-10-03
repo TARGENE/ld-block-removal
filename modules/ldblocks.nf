@@ -13,9 +13,13 @@ process pull_ld {
     PREFIX = longest_prefix(BGEN_FILES)
     """
     if [[ "${params.COHORT}" == "UKB" ]]; then 
-        CHR_FORMAT=\$(echo ${CHR} | xargs printf "%02d" )
+        if [[ "${params.RUN_TYPE}" == "TEST" ]]; then
+            CHR_FORMAT=\$( echo ${CHR} )
+        else
+            CHR_FORMAT=\$( echo ${CHR} | xargs printf "%02d" )
+        fi
     elif [[ "${params.COHORT}" == "GENOMICC" ]]; then 
-        CHR_FORMAT=\$(echo chr${CHR} )
+        CHR_FORMAT=\$( echo chr${CHR} )
     fi
 
     BGEN_FILE="${PREFIX}${CHR}.bgen"
