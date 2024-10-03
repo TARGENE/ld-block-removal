@@ -6,6 +6,7 @@ params.TRAITS_DATASET = "You need to provide a Traits dataset."
 params.UKB_ENCODING_FILE = "NO_UKB_ENCODING_FILE"
 params.MAF_THRESHOLD = 0.01
 params.COHORT = "UKB"
+params.RUN_TYPE = "DISCOVERY"
 params.UKB_CONFIG = "${projectDir}/assets/ukbconfig.yaml"
 params.UKB_WITHDRAWAL_LIST = "${projectDir}/assets/NO_WITHDRAWAL_LIST"
 params.OUTDIR = "${launchDir}/results"
