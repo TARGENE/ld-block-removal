@@ -1,18 +1,25 @@
+include { longest_prefix } from './utils.nf'
+
 process pull_ld {
     label 'qctool_image'
 
     input:
-    tuple val(RSID), val(CHR), val(POS), val(PREFIX), path(BGEN_FILES)
+    tuple val(RSID), val(CHR), val(POS), path(BGEN_FILES)
 
     output:
     tuple val(RSID), val(CHR), val(POS), path("*.sqlite")
  
     script:
+    PREFIX = longest_prefix(BGEN_FILES)
     """
-    if [[ "${params.COHORT}" == "UKBB" ]]; then 
-        CHR_FORMAT=\$(echo ${CHR} | xargs printf "%02d" )
+    if [[ "${params.COHORT}" == "UKB" ]]; then 
+        if [[ "${params.RUN_TYPE}" == "TEST" ]]; then
+            CHR_FORMAT=\$( echo ${CHR} )
+        else
+            CHR_FORMAT=\$( echo ${CHR} | xargs printf "%02d" )
+        fi
     elif [[ "${params.COHORT}" == "GENOMICC" ]]; then 
-        CHR_FORMAT=\$(echo chr${CHR} )
+        CHR_FORMAT=\$( echo chr${CHR} )
     fi
 
     BGEN_FILE="${PREFIX}${CHR}.bgen"
@@ -47,7 +54,7 @@ process pull_ld {
 }
 
 process compile_ld_information {
-    label 'bgen_python_image'
+    label 'r_python_image'
     publishDir("$params.OUTDIR/ld_blocks/", mode: "copy", pattern: "*LD_block*")
 
     input:
