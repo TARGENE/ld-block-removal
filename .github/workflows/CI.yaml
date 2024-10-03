@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         testrun:
-          - "test/test1.py"
+          - "test1.py"
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
