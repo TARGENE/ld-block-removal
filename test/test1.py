@@ -3,12 +3,10 @@ import pandas as pd
 import pytest
 import os
 
-# Define the command to run as a list
-command = ["nextflow","run","main.nf","-c","test/test.config","-profile","ci"]
-
 # Run command to generate results first
 @pytest.fixture(scope="module", autouse=True)
-def generate_results(command):
+def generate_results():
+    command = ["nextflow","run","main.nf","-c","test/test.config","-profile","ci"]
     result = subprocess.run(command, capture_output=True, text=True)
     return result
 
