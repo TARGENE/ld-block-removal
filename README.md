@@ -18,19 +18,19 @@ conda activate nextflow
 ### Configuration
 Input data and parameters are specified in a run-specific configuration file created by the user. An example is found in `test/test.config`, and can include the following parameters:
 * `COHORT` [ default = "UKB" ] : Genomic cohort you are working with. Current supported cohorts are UKB and GENOMICC. These are configured to format the chromosome values as they are represented in the BGEN files for a given cohort. If UKB or GENOMICC are not specified, the default will be tot ake the integer value for each chromosome, with no prefix.
-* `RUN_TYPE` [ default = "DISCOVERY" ] : Any non-test run.
 * `INPUT_SNPS` [ required ] : Path to a CSV file, where each line represents a SNP-of-interest. Columns must be RSID, CHR, POS. RSID must be in the format as it appears in the BGEN files. 
 * `BGEN_FILES` [ required ] : Path to BGEN files for the cohort-of-interest. Must be split by chromosome and specified as so: "/path/to/bgen/files/test_cohort_chr*.{bgen,sample,bgen.bgi}".
 * `BED_FILES` [ required ] : Path to BED files to use for PCA after LD blocks have been removed. Must be split by chromosome and specified as so: "/path/to/bed/files/test_cohort_chr*.{bed,bim,fam}".
-* `NB_PCS = 5` [ default = 50 ] : Number of PCs to compute usign FlashPCA2 after removing LD blocks. 
-* `FLASHPCA_EXCLUSION_REGIONS` [ default = assets/exclusion_regions_hg19.txt ] : Regions to exclude from BED files before PCA. hg38 also available in assets/exclusion_regions_hg38.txt.
 * `TRAITS_DATASET` [ required ] : see https://targene.github.io/targene-pipeline/stable/all_workflows_parameters/.
+* `RUN_TYPE` [ default = "DISCOVERY" ] : Any non-test run.
+* `NB_PCS` [ default = 50 ] : Number of PCs to compute usign FlashPCA2 after removing LD blocks. 
+* `FLASHPCA_EXCLUSION_REGIONS` [ default = assets/exclusion_regions_hg19.txt ] : Regions to exclude from BED files before PCA. hg38 also available in assets/exclusion_regions_hg38.txt.
 * `UKB_ENCODING_FILE` [ default = "NO_UKB_ENCODING_FILE" ] : see https://targene.github.io/targene-pipeline/stable/all_workflows_parameters/.
-* `UKB_WITHDRAWAL_LIST` [ default = "${projectDir}/assets/NO_WITHDRAWAL_LIST" ] : see https://targene.github.io/targene-pipeline/stable/all_workflows_parameters/.
-* `UKB_CONFIG` [ default = "${projectDir}/assets/ukbconfig.yaml" ] : see https://targene.github.io/targene-pipeline/stable/all_workflows_parameters/.
-* `QC_FILE` [ default = "${projectDir}/assets/NO_QC_FILE" ] : see https://targene.github.io/targene-pipeline/stable/all_workflows_parameters/.
+* `UKB_WITHDRAWAL_LIST` [ default = "assets/NO_WITHDRAWAL_LIST" ] : see https://targene.github.io/targene-pipeline/stable/all_workflows_parameters/.
+* `UKB_CONFIG` [ default = "assets/ukbconfig.yaml" ] : see https://targene.github.io/targene-pipeline/stable/all_workflows_parameters/.
+* `QC_FILE` [ default = "assets/NO_QC_FILE" ] : see https://targene.github.io/targene-pipeline/stable/all_workflows_parameters/.
 * `MAF_THRESHOLD` [ default = 0.01 ] : minor allele frequency threshold when filtering BED files during LD block removal.
-* `OUTDIR` [ default = "${launchDir}/results" ] : Output directory for final results. 
+* `OUTDIR` [ default = "results/" ] : Output directory for final results. 
 
 ## Run
 Once your configuration file has been set up, you can run the pipeline at the command-line using nextflow.
