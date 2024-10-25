@@ -58,7 +58,7 @@ process pull_ld {
 
 process compile_ld_information {
     label 'r_python_image'
-    publishDir("$params.OUTDIR/ld_blocks/", mode: "copy", pattern: "*LD_block*")
+    publishDir("$params.OUTDIR/ld_blocks/", mode: "copy")
 
     input:
     path sqlite_files
