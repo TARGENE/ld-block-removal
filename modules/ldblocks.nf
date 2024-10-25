@@ -18,8 +18,11 @@ process pull_ld {
         else
             CHR_FORMAT=\$( echo ${CHR} | xargs printf "%02d" )
         fi
-    elif [[ "${params.COHORT}" == "GENOMICC" ]]; then 
+    elif [[ "${params.COHORT}" == "GENOMICC" || "${params.COHORT}" == "ALLOFUS" ]]; then 
         CHR_FORMAT=\$( echo chr${CHR} )
+    else
+	echo "Unknown cohort specified, assuming chromosome in BGEN files are formatted as chr${CHR}"
+	CHR_FORMAT=\$( echo chr${CHR} )
     fi
 
     BGEN_FILE="${PREFIX}${CHR}.bgen"
