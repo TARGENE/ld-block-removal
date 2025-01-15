@@ -1,16 +1,13 @@
-include { longest_prefix } from './utils.nf'
-
 process pull_ld {
     label 'qctool_image'
 
     input:
-    tuple val(RSID), val(CHR), val(POS), path(BGEN_FILES)
+    tuple val(CHR), val(RSID), val(POS), val(PREFIX), path(BGEN_FILES)
 
     output:
     tuple val(RSID), val(CHR), val(POS), path("*.sqlite")
  
     script:
-    PREFIX = longest_prefix(BGEN_FILES)
     """
     if [[ "${params.COHORT}" == "UKB" ]]; then 
         if [[ "${params.RUN_TYPE}" == "TEST" ]]; then
@@ -25,8 +22,8 @@ process pull_ld {
 	CHR_FORMAT=\$( echo chr${CHR} )
     fi
 
-    BGEN_FILE="${PREFIX}${CHR}.bgen"
-    SAMPLE_FILE="${PREFIX}${CHR}.sample"
+    BGEN_FILE="${PREFIX}.bgen"
+    SAMPLE_FILE="${PREFIX}.sample"
 
     # Define lower and upper bounds to scan for LD
     LOWER=\$((${POS} - 10000000))
