@@ -8,11 +8,24 @@ workflow ImportSNPs {
             .fromPath(params.INPUT_SNPS, checkIfExists: true)
             .splitCsv(header:true)
             .map {
-                row -> tuple(row.RSID, row.CHR, row.POS)
+                row -> tuple(row.CHR, row.RSID, row.POS)
             }
-            .combine(bgen_files)
-            .set { snps_bgen_ch }
+            .set {snps_ch}
+        
+        bgen_files
+            .map { prefix, files ->
+                def match = prefix =~ /(\d+)$/
+                def chr = match ? match.group(1) : null
+                if (chr == null) {
+                    println "Warning: Could not extract chromosome number from ${prefix}"
+                    chr = "null"  // or any other default value
+                }
+                return [chr, prefix, files]
+            }
+            .set {bgen_ch}
 
+        snps_bgen_ch = snps_ch.join(bgen_ch)
+        
     emit:
         snps_bgen_ch
 }
