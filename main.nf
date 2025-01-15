@@ -30,11 +30,11 @@ workflow {
     qc_file = Channel.value(file("$params.QC_FILE", checkIfExists: true))
     flashpca_excl_reg = Channel.value(file("$params.FLASHPCA_EXCLUSION_REGIONS", checkIfExists: true))
     bed_files = Channel.fromFilePairs("$params.BED_FILES", size: 3, checkIfExists: true){ file -> file.baseName }
-    bgen_files = Channel.fromPath("$params.BGEN_FILES", checkIfExists: true).collect().toList()
+    bgen_files = Channel.fromFilePairs("$params.BGEN_FILES", size: 3, checkIfExists: true)
 
     // Compute LD blocks
     ImportSNPs(bgen_files)
-
+    
     ComputeLD(ImportSNPs.out)
     
     // Extract Traits
