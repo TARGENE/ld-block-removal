@@ -46,5 +46,5 @@ workflow ComputeLD {
         script_ch = Channel.fromPath("$projectDir/py/convert_sqlite.py")
         qtls_ch = compile_ld_information(sqlite_ch, csv_ch, script_ch)
     emit:
-        ld_blocks = qtls_ch.ld_pca
+        ld_blocks = qtls_ch.ld_blocks
 }
