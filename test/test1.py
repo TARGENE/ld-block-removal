@@ -18,10 +18,10 @@ def test_run_completed(generate_results):
     assert generate_results.returncode == 0
 
 def test_ld_block_output(generate_results):
-    ld_blocks = pd.read_csv("results/ld_blocks/snps_with_LD_blocks.csv")
-    assert len(ld_blocks.RSID) == 3, "Expected 3 SNPs in output LD blocks file."
+    ld_blocks = pd.read_csv("results/ld_blocks/snps_with_LD_blocks.csv", header=None)
+    assert ld_blocks.shape[0] == 3, "Expected 3 SNPs in output LD blocks file."
     assert len(ld_blocks.columns) == 8, "Expected 8 columns in LD blocks file."
-    assert ld_blocks.columns.tolist() == ['RSID','CHR','POS','LDblock_lower','LDblock_upper','LDblock_length','lower_bound','upper_bound'], "Column names do not match expected in LD blocks file."
+    assert ld_blocks[ld_blocks.columns[1]].isin([1,2,3]).all()==True, "Expected chromosomes 1, 2 and 3 in output file."
 
 def test_screeplot_exists(generate_results):
     assert os.path.exists("results/pca/ScreePlot.pdf"), "Expected file ScreePlot.pdf from pipeline run."
