@@ -2,7 +2,7 @@ process pull_ld {
     label 'qctool_image'
 
     input:
-    tuple val(CHR), val(RSID), val(POS), val(PREFIX), path(BGEN_FILES)
+    tuple val(RSID), val(CHR), val(POS), val(PREFIX), path(BGEN_FILES)
 
     output:
     tuple val(RSID), val(CHR), val(POS), path("*.sqlite")
