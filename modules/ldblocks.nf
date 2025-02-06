@@ -1,5 +1,6 @@
 process pull_ld {
     label 'qctool_image'
+    label 'bigmem'
 
     input:
     tuple val(RSID), val(CHR), val(POS), val(PREFIX), path(BGEN_FILES)
