@@ -14,7 +14,7 @@ workflow ImportSNPs {
         
         bgen_files
             .map { prefix, files ->
-                def match = prefix =~ /(\d+)$/
+                def match = prefix =~ /(\d+|X|Y)$/
                 def chr = match ? match.group(1) : null
                 if (chr == null) {
                     println "Warning: Could not extract chromosome number from ${prefix}"
@@ -24,7 +24,10 @@ workflow ImportSNPs {
             }
             .set {bgen_ch}
 
-        snps_bgen_ch = snps_ch.join(bgen_ch)
+        // add proper chromosome BGEN files into SNP channel
+        snps_bgen_ch = snps_ch.combine(bgen_ch)
+            .filter { it -> it[0] == it[3] }
+            .map { chr, snp, pos, _chr2, prefix, files -> [snp, chr, pos, prefix, files]}
         
     emit:
         snps_bgen_ch
@@ -36,8 +39,9 @@ workflow ComputeLD {
 
     main:
         ld_ch = pull_ld(snps_bgen)
+
         // filter for just sqlite files and collect
-        ld_ch.map{ snp, chr, pos, sqlite_files -> sqlite_files }
+        ld_ch.map{ _snp, _chr, _pos, sqlite_files -> sqlite_files }
             .collect()
             .set { sqlite_ch }
 
