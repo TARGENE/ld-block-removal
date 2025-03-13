@@ -71,7 +71,7 @@ if __name__ == '__main__':
     # Save to .csv file 
     basename = input_file.replace(".csv","")
     outname = basename+"_with_LD_blocks.csv"
-    SNPs.to_csv(outname, index=False, header=False, sep=",")
+    SNPs.to_csv(outname, index=False, header=False, sep="\t")
 
     plot_histogram(SNPs, '.')
    
