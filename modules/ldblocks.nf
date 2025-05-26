@@ -7,7 +7,7 @@ process pull_ld {
 
     output:
     tuple val(RSID), val(CHR), val(POS), path("*.sqlite"), emit: sqlite
-    tuple path("${RSID}.bgen"), path("${RSID}.bgen.bgi"), emit: snp_bgens
+    path "*.bgen*", emit: snp_bgens
  
     script:
     """
