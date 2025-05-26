@@ -41,7 +41,7 @@ workflow ComputeLD {
         ld_ch = pull_ld(snps_bgen)
 
         // filter for just sqlite files and collect
-        ld_ch.map{ _snp, _chr, _pos, sqlite_files -> sqlite_files }
+        ld_ch.sqlite.map{ _snp, _chr, _pos, sqlite_files -> sqlite_files }
             .collect()
             .set { sqlite_ch }
 
