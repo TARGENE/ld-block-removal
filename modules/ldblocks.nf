@@ -1,4 +1,5 @@
 process pull_ld {
+    scratch true // to avoid errors upon resubmission
     label 'qctool_image'
     label 'bigmem'
 
