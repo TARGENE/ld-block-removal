@@ -1,4 +1,5 @@
 process pull_ld {
+    scratch true // to avoid errors upon resubmission
     label 'qctool_image'
     label 'bigmem'
 
@@ -6,7 +7,8 @@ process pull_ld {
     tuple val(RSID), val(CHR), val(POS), val(PREFIX), path(BGEN_FILES)
 
     output:
-    tuple val(RSID), val(CHR), val(POS), path("*.sqlite")
+    tuple val(RSID), val(CHR), val(POS), path("*.sqlite"), emit: sqlite
+    path "*.bgen*", emit: snp_bgens
  
     script:
     """
