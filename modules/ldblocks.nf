@@ -2,7 +2,8 @@ include { longest_prefix } from './utils.nf'
 
 process pull_ld {
     label 'qctool_image'
-
+    label 'bigmem'
+    
     input:
     tuple val(RSID), val(CHR), val(POS), path(BGEN_FILES)
 
