@@ -3,7 +3,7 @@ process pull_ld {
     label 'bigmem'
 
     input:
-    tuple val(RSID), val(CHR), val(POS), val(PREFIX), path(BGEN_FILES)
+    tuple val(RSID), val(CHR), val(POS), val(PREFIX), path(BGEN_FILES), path(TRAITS)
 
     output:
     tuple val(RSID), val(CHR), val(POS), path("*.sqlite")
@@ -23,7 +23,7 @@ process pull_ld {
 	CHR_FORMAT=\$( echo chr${CHR} )
     fi
 
-    BGEN_FILE="${PREFIX}.bgen"
+        BGEN_FILE="${PREFIX}.bgen"
     SAMPLE_FILE="${PREFIX}.sample"
 
     # Define lower and upper bounds to scan for LD
@@ -32,24 +32,37 @@ process pull_ld {
 
     # Account for the possibility that the scan range becomes negative.
     if [ \$LOWER -lt 0 ]
-    then  
+    then
       LOWER="0"
     fi
 
     if [ \$UPPER -lt 0 ]
-    then  
+    then
       UPPER="0"
     fi
 
-    OUTNAME=\$( echo ${RSID} | sed 's/:/_/g' )
+    OUTNAME=\$(echo ${RSID} | sed 's/:/_/g')
 
-    # Use bgenix to create a new .bgen file with the info for just the SNP of interest + index file
+    # Extract sample ids from traits dataset
+    awk -F, '
+    NR==1 {
+        for (i=1; i<=NF; i++) if (\$i=="SAMPLE_ID") col=i
+        next
+    }
+    { print \$col }
+    ' ${TRAITS} > samples.txt
+
+    # Create a new .bgen file with the SNP of interest + index file
     bgenix -g \$BGEN_FILE -incl-rsids ${RSID} > "\$OUTNAME.bgen"
     bgenix -g "\$OUTNAME.bgen" -index
 
-    bgenix -g \$BGEN_FILE -incl-range "\$CHR_FORMAT:\$LOWER-\$UPPER" | qctool -g - -filetype bgen \
-           -s \$SAMPLE_FILE -compute-ld-with "\$OUTNAME.bgen" \$SAMPLE_FILE -old "sqlite://\$OUTNAME.sqlite:LD"  \
-           -min-r2 0.05
+    # Scan LD only within the traits samples
+    bgenix -g "\$BGEN_FILE" -incl-range "\$CHR_FORMAT:\$LOWER-\$UPPER" | qctool -g - -filetype bgen \
+       -s "\$SAMPLE_FILE" \
+       -incl-samples samples.txt \
+       -compute-ld-with "\$OUTNAME.bgen" "\$SAMPLE_FILE" \
+       -old "sqlite://\$OUTNAME.sqlite:LD" \
+       -min-r2 0.05
     """
 
 }
