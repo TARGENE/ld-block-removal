@@ -36,7 +36,7 @@ workflow {
     // Compute LD blocks
     ImportSNPs(bgen_files)
     
-    ComputeLD(ImportSNPs.out)
+    ComputeLD(ImportSNPs.out.combine(traits_dataset))
     
     // Extract Traits
     ExtractTraits(
