@@ -4,7 +4,7 @@ workflow ImportSNPs {
     take:
         bgen_files
     main:
-        Channel
+        channel
             .fromPath(params.INPUT_SNPS, checkIfExists: true)
             .splitCsv(header:true)
             .map {
@@ -14,15 +14,15 @@ workflow ImportSNPs {
         
         bgen_files
             .map { prefix, files ->
-                def match = prefix =~ /(\d+|X|Y)$/
-                def chr = match ? match.group(1) : null
+                def match = (prefix =~ /\.chr(\d+|X|Y)/)
+                def chr = match.find() ? match.group(1) : null
                 if (chr == null) {
-                    println "Warning: Could not extract chromosome number from ${prefix}"
-                    chr = "null"  // or any other default value
+                    println "Warning: Could not extract chromosome number from '${prefix}'"
+                    chr = "null"
                 }
                 return [chr, prefix, files]
             }
-            .set {bgen_ch}
+            .set { bgen_ch }
 
         // add proper chromosome BGEN files into SNP channel
         snps_bgen_ch = snps_ch.combine(bgen_ch)
@@ -46,8 +46,8 @@ workflow ComputeLD {
             .set { sqlite_ch }
 
         // compile LD_block information
-        csv_ch = Channel.fromPath(params.INPUT_SNPS, checkIfExists: true)
-        script_ch = Channel.fromPath("$projectDir/py/convert_sqlite.py")
+        csv_ch = channel.fromPath(params.INPUT_SNPS, checkIfExists: true)
+        script_ch = channel.fromPath("$projectDir/py/convert_sqlite.py")
         qtls_ch = compile_ld_information(sqlite_ch, csv_ch, script_ch)
     emit:
         ld_blocks = qtls_ch.ld_blocks

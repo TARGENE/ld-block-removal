@@ -1,4 +1,4 @@
-include { filterBED; thinByLD; mergeBEDS; SampleQCFilter; FlashPCA; ScreePlot } from '../modules/confounders.nf'
+include { filterBED; thinByLD; mergeBEDS; SampleQCFilter } from '../modules/confounders.nf'
 include { leave_chr_out } from '../modules/utils.nf'
 
 workflow IIDGenotypes{

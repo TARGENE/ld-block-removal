@@ -16,7 +16,8 @@ params.FLASHPCA_EXCLUSION_REGIONS = "${projectDir}/assets/exclusion_regions_hg19
 
 // Import subworkflows
 include { ImportSNPs; ComputeLD } from './subworkflows/ldblocks.nf'
-include { IIDGenotypes; FlashPCA; ScreePlot } from './subworkflows/confounders.nf'
+include { IIDGenotypes } from './subworkflows/confounders.nf'
+include { FlashPCA; ScreePlot } from './modules/confounders.nf'
 include { ExtractTraits } from './subworkflows/extract_traits.nf'
 
 // Define workflow
